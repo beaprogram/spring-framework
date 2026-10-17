@@ -87,7 +87,7 @@ jobs:
           path: |
             spring-expression/build/test-results/test/
             spring-expression/build/reports/checkstyle/
-            spring-expression/build/reports/architecture/
+            spring-expression/build/checkArchitectureMain/
             upstream-check.log
             designite-output/
             dcode-result.json
