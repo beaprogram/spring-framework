@@ -21,9 +21,9 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.TypeConverter;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -42,7 +42,8 @@ public abstract class ExpressionUtils {
 	 * @since 7.1
 	 */
 	public static @Nullable Object evaluate(String expressionString) {
-		return new SpelExpressionParser().parseExpression(expressionString).getValue();
+		SpelExpressionParser parser = new SpelExpressionParser();
+		return parser.parseExpression(expressionString).getValue();
 	}
 
 	/**
