@@ -1,0 +1,93 @@
+name: DCode Spring Expression case study
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [case-study/spring-expression-architecture]
+    paths:
+      - 'spring-expression/**'
+      - '.github/workflows/dcode-spring-expression.yml'
+      - '.github/scripts/dcode-spring-result.py'
+      - 'case-study/spring-expression/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dcode-spring-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  case-study:
+    if: github.repository == 'beaprogram/spring-framework'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Run the module functional tests
+        run: ./gradlew :spring-expression:test --no-daemon --max-workers=2
+      - name: Record all upstream module checks independently
+        id: upstream
+        shell: bash
+        run: |
+          set +e
+          ./gradlew :spring-expression:check --no-daemon --max-workers=2 > upstream-check.log 2>&1
+          result=$?
+          echo "exit_code=$result" >> "$GITHUB_OUTPUT"
+          cat upstream-check.log
+          echo "Upstream check exit code: $result"
+      - name: Generate the production source dependency graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location https://www.designite-tools.com/assets/DesigniteJava.jar --output "$RUNNER_TEMP/DesigniteJava.jar"
+          echo "8324e6d1a5fc706295a3f46d3124c69e458315ebfbe62c1e364f48e2ca45e73b  $RUNNER_TEMP/DesigniteJava.jar" | sha256sum --check
+          java -jar "$RUNNER_TEMP/DesigniteJava.jar" -i spring-expression/src/main/java -o designite-output -g -d
+          test -s designite-output/DependencyGraph.graphml
+      - name: Upload and enforce the DCode architecture result
+        env:
+          DCODE_API_KEY: ${{ secrets.DCODE_API_KEY }}
+          DCODE_PROJECT_ID: ${{ vars.DCODE_PROJECT_ID }}
+          DCODE_ENFORCE_ARCH: ${{ vars.DCODE_ENFORCE_ARCH }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${DCODE_API_KEY:?Set the project API key secret}"
+          : "${DCODE_PROJECT_ID:?Set the project ID variable}"
+          forms=()
+          index=1
+          for file in designite-output/*.csv designite-output/*.graphml; do
+            test -f "$file"
+            forms+=(--form "file${index}=@${file}")
+            index=$((index + 1))
+          done
+          curl --fail --silent --show-error \
+            --header "X-API-Key: $DCODE_API_KEY" \
+            --header "X-Commit-ID: $GITHUB_SHA" \
+            --header "X-Tool: designiteJava" \
+            "${forms[@]}" \
+            "https://dcodehub.com/api/projects/${DCODE_PROJECT_ID}/upload/" \
+            --output "$RUNNER_TEMP/dcode-response.json"
+          python3 .github/scripts/dcode-spring-result.py
+      - name: Enforce independently recorded upstream checks
+        if: always() && steps.upstream.outputs.exit_code != ''
+        env:
+          UPSTREAM_CHECK_EXIT: ${{ steps.upstream.outputs.exit_code }}
+        run: test "$UPSTREAM_CHECK_EXIT" = 0
+      - name: Preserve commit-linked evidence even for a failed gate
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: spring-expression-evidence-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            spring-expression/build/test-results/test/
+            spring-expression/build/reports/checkstyle/
+            spring-expression/build/reports/architecture/
+            upstream-check.log
+            designite-output/
+            dcode-result.json
