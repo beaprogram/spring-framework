@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.TypeConverter;
 import org.springframework.expression.TypedValue;
 import org.springframework.util.ClassUtils;
@@ -33,6 +34,16 @@ import org.springframework.util.ClassUtils;
  * @since 3.0
  */
 public abstract class ExpressionUtils {
+
+	/**
+	 * Evaluate an expression using the default expression language.
+	 * @param expressionString the expression to evaluate
+	 * @return the evaluated value
+	 * @since 7.1
+	 */
+	public static @Nullable Object evaluate(String expressionString) {
+		return new SpelExpressionParser().parseExpression(expressionString).getValue();
+	}
 
 	/**
 	 * Determines if there is a type converter available in the specified context and
