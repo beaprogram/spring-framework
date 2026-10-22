@@ -1,0 +1,24 @@
+query SelectJavaArchitectureRepositories($searchQuery: String!, $first: Int!) {
+  search(query: $searchQuery, type: REPOSITORY, first: $first) {
+    repositoryCount
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      ... on Repository {
+        nameWithOwner
+        url
+        description
+        stargazerCount
+        forkCount
+        isFork
+        isArchived
+        primaryLanguage { name }
+        licenseInfo { spdxId }
+        defaultBranchRef { name target { oid } }
+        readmeUpper: object(expression: "HEAD:README.md") { ... on Blob { text } }
+        readmeLower: object(expression: "HEAD:readme.md") { ... on Blob { text } }
+        root: object(expression: "HEAD:") { ... on Tree { entries { name type } } }
+      }
+    }
+  }
+  rateLimit { cost remaining resetAt }
+}

@@ -1,0 +1,9 @@
+{
+  "recordedAtUtc": "2026-10-17T01:58:47.121476+00:00",
+  "reportingDate": "2026-10-16 America/Halifax",
+  "baseCount": 500,
+  "narrowedCount": 77,
+  "returnedCandidates": 20,
+  "query": "architecture in:readme language:Java stars:>5000 forks:>=1000 is:public fork:false archived:false sort:stars-desc",
+  "forkThresholdInterpretation": "at least 1000"
+}
