@@ -1,0 +1,3 @@
+# Preserve evidence archives and the review copy byte-for-byte.
+*.zip binary
+*.pdf binary

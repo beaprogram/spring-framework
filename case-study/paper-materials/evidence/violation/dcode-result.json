@@ -1,0 +1,12 @@
+{
+  "commit": "b9cf2ac13b5bc573386c02294bdb60f50e0a114c",
+  "architecture_gate": {
+    "is_active": true,
+    "result": "FAILED",
+    "details": {
+      "totalViolations": 1,
+      "totalWarnings": 0,
+      "totalEdgesAnalyzed": 517
+    }
+  }
+}

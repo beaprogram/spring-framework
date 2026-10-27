@@ -1,0 +1,83 @@
+diff --git a/spring-expression/src/main/java/org/springframework/expression/common/ExpressionUtils.java b/spring-expression/src/main/java/org/springframework/expression/common/ExpressionUtils.java
+index 6c52192..1b66572 100644
+--- a/spring-expression/src/main/java/org/springframework/expression/common/ExpressionUtils.java
++++ b/spring-expression/src/main/java/org/springframework/expression/common/ExpressionUtils.java
+@@ -23,6 +23,7 @@ import org.springframework.expression.EvaluationContext;
+ import org.springframework.expression.EvaluationException;
+ import org.springframework.expression.TypeConverter;
+ import org.springframework.expression.TypedValue;
++import org.springframework.expression.spel.standard.SpelExpressionParser;
+ import org.springframework.util.ClassUtils;
+ 
+ /**
+@@ -34,6 +35,17 @@ import org.springframework.util.ClassUtils;
+  */
+ public abstract class ExpressionUtils {
+ 
++	/**
++	 * Evaluate an expression using the default expression language.
++	 * @param expressionString the expression to evaluate
++	 * @return the evaluated value
++	 * @since 7.1
++	 */
++	public static @Nullable Object evaluate(String expressionString) {
++		SpelExpressionParser parser = new SpelExpressionParser();
++		return parser.parseExpression(expressionString).getValue();
++	}
++
+ 	/**
+ 	 * Determines if there is a type converter available in the specified context and
+ 	 * attempts to use it to convert the supplied value to the specified type. Throws an
+diff --git a/spring-expression/src/test/java/org/springframework/expression/spel/ExpressionUtilsConvenienceTests.java b/spring-expression/src/test/java/org/springframework/expression/spel/ExpressionUtilsConvenienceTests.java
+new file mode 100644
+index 0000000..b53614f
+--- /dev/null
++++ b/spring-expression/src/test/java/org/springframework/expression/spel/ExpressionUtilsConvenienceTests.java
+@@ -0,0 +1,47 @@
++/*
++ * Copyright 2002-present the original author or authors.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.springframework.expression.spel;
++
++import org.junit.jupiter.api.Test;
++
++import org.springframework.expression.common.ExpressionUtils;
++
++import static org.assertj.core.api.Assertions.assertThat;
++
++/**
++ * Functional checks for the controlled expression-evaluation convenience method.
++ * @author Arup Halder
++ */
++class ExpressionUtilsConvenienceTests {
++
++	@Test
++	void evaluatesArithmetic() {
++		assertThat(ExpressionUtils.evaluate("6 * 7")).isEqualTo(42);
++	}
++
++	@Test
++	void evaluatesStringOperation() {
++		assertThat(ExpressionUtils.evaluate("'spring'.toUpperCase()"))
++				.isEqualTo("SPRING");
++	}
++
++	@Test
++	void evaluatesNull() {
++		assertThat(ExpressionUtils.evaluate("null")).isNull();
++	}
++
++}

@@ -1,9 +1,19 @@
 # Spring Expression: case study details
 
-This page brings together the repository selection, architecture definition, controlled
-change, saved validation results, and reproduction workflow for the Spring Expression case study.
-All figures and explanations below are available without a DCode account.
-The experiment studies **`spring-expression/src/main/java`**, not all of Spring Framework.
+**Can a functionally correct change violate a fixed architecture rule?** In this controlled
+case study, adding `ExpressionUtils.evaluate(String)` creates one Common-to-SpEL dependency.
+All functional tests pass, but DCode's architecture gate changes from **Passed → Failed**.
+Removing the method and its three tests restores the baseline graph and a **Passed** result.
+
+The study covers **`spring-expression/src/main/java`**, one Spring Framework module.
+It demonstrates the response to one deliberate mutation under one fixed rule set; it does
+not measure general detection accuracy or whole-framework compliance.
+
+Start with the results below, then inspect the [architecture figure](#intended-architecture-and-its-sources),
+[controlled change](#controlled-change), and [saved reports](#saved-validation-evidence).
+The [preserved evidence bundle](paper-materials/evidence/) supports an offline audit without
+DCode membership. [Download the PDF review copy](Spring-Expression-Case-Study.pdf).
+For a fresh execution, see [reproduction](#reproduction-workflow).
 
 ## Selected revision and experiment commits
 
@@ -78,20 +88,22 @@ way to introduce a cycle. In DCode, **Common utilities to SpEL implementation is
 That directional rule is our operational interpretation of Spring's acyclic-slice
 constraint for this experiment. It is not a literal directional rule quoted from the
 maintainers, nor evidence that DCode implements every upstream ArchUnit constraint.
-The Expression API component is included even though the screenshot's explicit red
-rule connects only Common and SpEL; absence of another drawn rule does not mean the
-corresponding source dependencies are absent.
+The figure separates the component rule from selected actual source dependencies.
+For example, `ExpressionUtils → TypeConverter` connects Common to the Expression API.
+Unshown dependencies still exist; this is a focused explanation, not the full graph.
 
 ![Detailed intended architecture, with all five Common utilities members](paper-materials/screenshots/intended-architecture-detailed.svg)
 
-*Detailed reconstruction from the preserved architecture membership: all five Common
-utilities nodes are shown, together with representative API and SpEL nodes. The dashed
-red arrow is the component-level **Denied** rule, not a source dependency. Omitted nodes
-are counted explicitly. [Full membership of all 144 nodes](paper-materials/component-membership.json)
-is supplied for inspection. The figure does not imply that unshown dependencies are absent.*
+*Reconstruction from preserved published-v1 membership and original analyzer GraphML,
+not a DCode screenshot. All five Common members are shown; API and SpEL omissions are
+counted. The dashed red arrow denies the component direction. The separate solid red
+edge is the mutation; solid blue edges existed in baseline and remain after repair.
+[Full membership](paper-materials/component-membership.json) and
+[original graphs with an offline verifier](paper-materials/evidence/) allow inspection
+of all 144 fully qualified nodes and the depicted edges.*
 
 <details>
-<summary>Original DCode evidence for the published rule and Common membership</summary>
+<summary>Original DCode capture of published v1 and Common membership</summary>
 
 ![Published DCode version 1 and its five Common utilities members](paper-materials/screenshots/published-membership-2026-10-27.jpg)
 
@@ -101,6 +113,31 @@ visible together with the surrounding architecture. Opening a saved report or ch
 the view did not rerun analysis or publish another architecture version.
 
 </details>
+
+## Controlled change
+
+The [baseline-to-violation source comparison](https://github.com/beaprogram/spring-framework/compare/30d8786ed35582a772f8fdba44918a844b85f45b...b9cf2ac13b5bc573386c02294bdb60f50e0a114c)
+adds `ExpressionUtils.evaluate(String)` in Common utilities. It instantiates a typed
+`SpelExpressionParser` from SpEL. Three new tests check `6 * 7`, a string uppercase
+operation, and a null result. A [preserved diff](paper-materials/evidence/controlled-mutation.diff)
+is available alongside the evidence.
+
+The graph comparison has **exactly one added edge and no removed edges**:
+
+```text
+ExpressionUtils → SpelExpressionParser       introduced by the controlled mutation
+SpelExpressionParser → SpelExpression        already present in the baseline
+SpelExpression → ExpressionUtils             already present in the baseline
+```
+
+The first edge crosses the denied Common-to-SpEL boundary; the other two form its
+return path. This is a deliberate architecture violation, not a naturally occurring
+Spring defect. Functional-test success and architecture-gate success answer different
+questions, so their disagreement is the intended observation.
+
+The [violation-to-repair comparison](https://github.com/beaprogram/spring-framework/compare/b9cf2ac13b5bc573386c02294bdb60f50e0a114c...3bce90dfb2cbffeb94b5cb90e76871b44c9dedc4)
+removes the added method and its three tests. Repair restores the original dependency
+edge set; it does **not** preserve the added API through a redesign.
 
 ## Saved validation evidence
 
@@ -117,12 +154,15 @@ Commit `30d8786e`: 0 violations, 0 warnings, 100% compliance, 516 dependency edg
 
 ### Controlled violation — failed
 
-![Controlled violation report: Common utilities to SpEL implementation](paper-materials/screenshots/violation-report-2026-10-27.jpg)
+![Controlled violation overview: selected commit, version 1, failed gate and one violation](paper-materials/screenshots/violation-overview-2026-10-27.jpg)
 
 Commit `b9cf2ac1`: 1 violation, 0 warnings, 517 dependency edges. The report identifies
 `ExpressionUtils → SpelExpressionParser` across the denied Common-to-SpEL boundary.
 The 99.8% aggregate compliance rate does **not** make the architecture gate pass:
 one denied dependency is sufficient for failure.
+[Open the full original violation report](paper-materials/screenshots/violation-report-2026-10-27.jpg)
+for the **Forbidden Dependencies** and **Rule Breakdown** sections near the bottom.
+The clean overview above is a viewport capture; the PDF also includes a labeled lower-report excerpt.
 
 ### Repair — passed
 
@@ -141,31 +181,81 @@ separately so their failure cannot prevent recording the DCode verdict; their fa
 are still enforced before job completion. Artifacts are retained even on gate failure.
 A successful upload with an inactive gate is not a passing architecture result.
 
-1. Check out the desired experiment commit from the results table.
-2. Inspect the workflow at that commit for the Java version and pinned analyzer checksum.
-3. Run the functional tests with `./gradlew :spring-expression:test --no-daemon --max-workers=2`.
-4. Run the independent upstream module checks with `./gradlew :spring-expression:check --no-daemon --max-workers=2`.
-5. To reproduce DCode validation in your own authorized project, configure the workflow
-   secret `DCODE_API_KEY` and variables `DCODE_PROJECT_ID` and `DCODE_ENFORCE_ARCH`.
-   Keep the same three component memberships and denied Common-to-SpEL rule for all stages.
-   Set enforcement to `true` for final validation; `false` is only for initial bootstrap.
-6. Compare the saved CI artifacts and gate verdicts with the table above. Never put
-   API keys in source or paste them into issue reports.
+### Audit the saved result without credentials
+
+The [evidence bundle](paper-materials/evidence/) contains original result JSON, GraphML,
+upstream-check logs and repacked original JUnit XML for each stage. Its provenance file
+records original artifact names and individual XML hashes. The verifier checks the
+checksum manifest, re-counts tests, checks node membership and all three gate results,
+and compares edge sets and the illustrated return path.
+
+```sh
+python3 case-study/paper-materials/evidence/verify.py
+```
+
+Run that command from this repository checkout. Expected output: 1,074 / 1,077 / 1,074
+passed tests; 11 skipped per stage; 144 nodes in each graph; 516 / 517 / 516 edges;
+PASSED / FAILED / PASSED gates; exactly one introduced edge and exact repair restoration.
+This audits preserved evidence; it does not reproduce the analyzer or server execution.
+
+### Repeat the experiment in a separate checkout
+
+Use a fresh clone so switching to historical commits does not disturb documentation work:
+
+```sh
+git clone https://github.com/beaprogram/spring-framework.git spring-expression-reproduction
+cd spring-expression-reproduction
+git checkout --detach 30d8786ed35582a772f8fdba44918a844b85f45b
+./gradlew :spring-expression:test --no-daemon --max-workers=2
+./gradlew :spring-expression:check --no-daemon --max-workers=2
+```
+
+Repeat the checkout and the two Gradle commands for these full revisions:
+
+| Stage | Commit | Expected functional tests | Expected upstream architecture check |
+| --- | --- | --- | --- |
+| Baseline | `30d8786ed35582a772f8fdba44918a844b85f45b` | 1,074 passed; 11 skipped | Pass |
+| Controlled violation | `b9cf2ac13b5bc573386c02294bdb60f50e0a114c` | 1,077 passed; 11 skipped | Fail: package-slice cycle |
+| Repair | `3bce90dfb2cbffeb94b5cb90e76871b44c9dedc4` | 1,074 passed; 11 skipped | Pass |
+
+The recorded workflow uses **Temurin JDK 25**, the checked-in Gradle wrapper, and an
+Ubuntu GitHub runner (`ubuntu-latest`, which is not an immutable environment).
+Inspect the workflow at each recorded commit; dependency downloads require network access.
+The analyzer is DesigniteJava with SHA-256
+`8324e6d1a5fc706295a3f46d3124c69e458315ebfbe62c1e364f48e2ca45e73b`.
+Its download URL is mutable: a changed binary must fail the checksum check, not silently
+replace the recorded analyzer. Access to a matching binary and applicable license/trial
+capacity is required for fresh graph extraction.
+
+To repeat DCode validation in your own authorized project:
+
+1. Use the recorded workflow and extraction scope `spring-expression/src/main/java`.
+2. Configure secret `DCODE_API_KEY` and variables `DCODE_PROJECT_ID` and `DCODE_ENFORCE_ARCH`.
+   Never put the API key in source. The original workflow restricts execution to the
+   experimental fork; a different fork must adapt that repository guard in its own copy.
+3. Bootstrap the graph with enforcement `false` only if needed to define the architecture.
+   Recreate the exact [component membership](paper-materials/component-membership.json)
+   and denied Common-to-SpEL rule in that project, then publish it.
+4. Set enforcement to `true` and keep that published definition fixed for all three stages.
+   The original project's definition was v1; a separate project may assign a different
+   version number. Match its contents, not just its label.
+5. Execute the recorded stages, uploading each actual commit SHA. Inspect `dcode-result.json`
+   and confirm `is_active: true`, the expected verdict, violation count and edge count.
+   The original workflow does not automatically import the saved membership JSON.
+
+## Limits and interpretation
+
+This is one module, one fixed rule set and one deliberately introduced source change.
+It does not establish whole-framework compliance, runtime dependency coverage, or
+accuracy on naturally occurring defects. A passing gate means the configured rules
+passed for that extracted graph, not that all architectural properties were checked.
 
 Other Spring modules are build dependencies only. The graph covers Java production
-sources, not external libraries, runtime edges, Kotlin sources, or test classes. The
-analyzer trial limit is a further constraint on reproducing the original extraction.
+sources, not external libraries, runtime edges, Kotlin sources or test classes. Graph
+nodes, source files, analyzer type rows and dashboard class counts must not be equated.
 
-## Controlled change and limits
-
-The mutation adds `ExpressionUtils.evaluate(String)`, which instantiates a typed
-`SpelExpressionParser`. Three additional functional tests cover arithmetic, a string
-operation, and a null result. The new source dependency is
-`ExpressionUtils` to `SpelExpressionParser`. With the existing return path through
-`SpelExpression`, this closes a package-slice cycle. Functional behavior continues to
-pass while architectural compliance fails; removing the mutation restores compliance.
-
-These results cover one module, one fixed rule set, and one deliberate source-code
-change. They do not establish whole-framework compliance, runtime dependency coverage,
-or detection accuracy on naturally occurring defects. Graph nodes, source files, and
-dashboard class counts measure different things and must not be equated.
+A fresh hosted run depends on the available analyzer, service version, credentials,
+runner and dependencies. These are not all immutable; identical present-day results
+are not guaranteed. The public archived evidence supports auditing the recorded run
+without those prerequisites. Checksums establish bundle integrity, not independent
+proof of original execution. No analysis was rerun during this documentation revision.
