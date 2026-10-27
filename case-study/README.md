@@ -102,17 +102,31 @@ edge is the mutation; solid blue edges existed in baseline and remain after repa
 [original graphs with an offline verifier](paper-materials/evidence/) allow inspection
 of all 144 fully qualified nodes and the depicted edges.*
 
-<details>
-<summary>Original DCode capture of published v1 and Common membership</summary>
+### What the five Common members contribute
 
-![Published DCode version 1 and its five Common utilities members](paper-materials/screenshots/published-membership-2026-10-27.jpg)
+These classes provide shared expression and template facilities. Their responsibilities
+explain why Common is a meaningful component, rather than just a box containing five
+names. The source links below refer to the selected upstream revision; the added
+`evaluate(String)` method belongs only to the controlled violation.
 
-The published definition is read-only. This capture shows the original component and
-the complete Common member list; the more detailed figure above makes those members
-visible together with the surrounding architecture. Opening a saved report or changing
-the view did not rerun analysis or publish another architecture version.
+| Common member | Responsibility relevant to the architecture |
+| --- | --- |
+| [`CompositeStringExpression`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/common/CompositeStringExpression.java) | Combines literal text and evaluated expression pieces into a template result. |
+| [`ExpressionUtils`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/common/ExpressionUtils.java) | Provides shared conversion helpers for expression implementations. The controlled change adds a method that directly constructs a SpEL parser. |
+| [`LiteralExpression`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/common/LiteralExpression.java) | Represents a fixed string value, including literal portions of a template. |
+| [`TemplateAwareExpressionParser`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/common/TemplateAwareExpressionParser.java) | Provides a base parser with template support; expression-language parsers supply the expression-specific parsing. |
+| [`TemplateParserContext`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/common/TemplateParserContext.java) | Supplies template parsing settings, including the expression prefix and suffix. |
 
-</details>
+The important change is the direction of dependence: `ExpressionUtils` starts depending
+on a concrete SpEL parser, while the baseline already contains SpEL-to-Common edges.
+The lower part of the figure follows one verified return path; it is not a drawing of
+every dependency or a claim that the five Common classes are independent of one another.
+
+The [original published-v1 membership capture](paper-materials/screenshots/published-membership-2026-10-27.jpg)
+is retained as supporting UI evidence. Its collapsed canvas is not the explanatory
+architecture figure. The detailed reconstruction above combines the preserved membership
+with verified source edges. Neither the published definition nor the existing draft was
+changed to produce it.
 
 ## Controlled change
 
