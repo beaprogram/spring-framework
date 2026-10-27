@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12Z" fill="#b42318"/></marker></defs>
+<rect width="1440" height="900" fill="#f8fafc"/>
+<style>text{font-family:Arial,sans-serif;fill:#182337}.title{font-size:30px;font-weight:700}.heading{font-size:22px;font-weight:700}.body{font-size:18px}.small{font-size:16px}.node{fill:white;stroke:#cbd5e1;stroke-width:1.5}</style>
+<text x="48" y="56" class="title" >Spring Expression — intended architecture</text>
+<text x="48" y="89" class="body" >Published version 1 • 144 source type / nested-type nodes • one fixed rule across all three stages</text>
+<rect x="48" y="130" width="410" height="520" rx="16" fill="#eff6ff" stroke="#cbd5e1"/>
+<text x="70" y="167" class="heading" >Expression API</text>
+<text x="70" y="196" class="small" >org.springframework.expression • 24 nodes</text>
+<rect x="70" y="220" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="243" class="small" >Expression</text>
+<rect x="70" y="264" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="287" class="small" >ExpressionParser</text>
+<rect x="70" y="308" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="331" class="small" >ParserContext</text>
+<rect x="70" y="352" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="375" class="small" >EvaluationContext</text>
+<rect x="70" y="396" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="419" class="small" >TypedValue</text>
+<rect x="70" y="440" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="463" class="small" >TypeConverter</text>
+<rect x="70" y="484" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="507" class="small" >PropertyAccessor</text>
+<rect x="70" y="528" width="366" height="34" rx="7" class="node"/>
+<text x="82" y="551" class="small" >MethodResolver</text>
+<text x="70" y="609" class="small" >8 shown; 16 further API nodes in membership file</text>
+<rect x="490" y="130" width="460" height="370" rx="16" fill="#ecfdf5" stroke="#cbd5e1"/>
+<text x="512" y="167" class="heading" >Common utilities</text>
+<text x="512" y="196" class="small" >org.springframework.expression.common • all 5 nodes</text>
+<rect x="512" y="220" width="416" height="34" rx="7" class="node"/>
+<text x="524" y="243" class="small" >CompositeStringExpression</text>
+<rect x="512" y="264" width="416" height="34" rx="7" class="node"/>
+<text x="524" y="287" class="small" >ExpressionUtils</text>
+<rect x="512" y="308" width="416" height="34" rx="7" class="node"/>
+<text x="524" y="331" class="small" >LiteralExpression</text>
+<rect x="512" y="352" width="416" height="34" rx="7" class="node"/>
+<text x="524" y="375" class="small" >TemplateAwareExpressionParser</text>
+<rect x="512" y="396" width="416" height="34" rx="7" class="node"/>
+<text x="524" y="419" class="small" >TemplateParserContext</text>
+<rect x="982" y="130" width="410" height="520" rx="16" fill="#fff7ed" stroke="#cbd5e1"/>
+<text x="1004" y="167" class="heading" >SpEL implementation</text>
+<text x="1004" y="196" class="small" >org.springframework.expression.spel.* • 115 nodes</text>
+<rect x="1004" y="220" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="243" class="small" >standard.SpelExpressionParser</text>
+<rect x="1004" y="264" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="287" class="small" >standard.SpelExpression</text>
+<rect x="1004" y="308" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="331" class="small" >standard.InternalSpelExpressionParser</text>
+<rect x="1004" y="352" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="375" class="small" >SpelParserConfiguration</text>
+<rect x="1004" y="396" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="419" class="small" >ExpressionState</text>
+<rect x="1004" y="440" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="463" class="small" >ast.SpelNodeImpl</text>
+<rect x="1004" y="484" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="507" class="small" >support.StandardEvaluationContext</text>
+<rect x="1004" y="528" width="366" height="34" rx="7" class="node"/>
+<text x="1016" y="551" class="small" >support.ReflectiveMethodResolver</text>
+<text x="1004" y="609" class="small" >8 shown; 107 further nodes in membership file</text>
+<path d="M720 500 V700 H1187 V651" fill="none" stroke="#b42318" stroke-width="5" stroke-dasharray="12 7" marker-end="url(#arrow)"/>
+<rect x="595" y="542" width="360" height="103" rx="12" fill="#fff1f2" stroke="#fda29b"/>
+<text x="615" y="575" class="heading" >DENIED: Common → SpEL</text>
+<text x="615" y="605" class="small" >The experimental component-level rule</text>
+<text x="615" y="628" class="small" >applies to every member of each group.</text>
+<text x="48" y="755" class="heading" >Controlled violation: ExpressionUtils → standard.SpelExpressionParser</text>
+<text x="48" y="789" class="body" >A new source dependency breaches this rule. Existing SpEL → Common dependencies make the reverse edge cyclic.</text>
+<text x="48" y="839" class="small" >Reconstructed from preserved component membership; not a UI screenshot. Only the explicit rule is drawn.</text>
+<text x="48" y="867" class="small" >Other source dependencies exist. See component-membership.json for all 144 fully qualified node names.</text>
+</svg>
