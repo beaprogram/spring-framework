@@ -130,7 +130,7 @@ on a concrete SpEL parser, while the baseline already contains SpEL-to-Common ed
 The lower part of the figure follows one verified return path; it is not a drawing of
 every dependency or a claim that the five Common classes are independent of one another.
 
-The [original published-v1 membership capture](paper-materials/screenshots/published-membership-2026-10-27.jpg)
+The [original published-v1 membership capture](paper-materials/screenshots/published-membership-2026-10-28.jpg)
 is retained as supporting UI evidence. Its collapsed canvas is not the explanatory
 architecture figure. The detailed reconstruction above combines the preserved membership
 with verified source edges. Neither the published definition nor the existing draft was
@@ -163,32 +163,32 @@ edge set; it does **not** preserve the added API through a redesign.
 
 ## Saved validation evidence
 
-The following captures were taken on 27 October 2026 by opening the original saved runs
+The following captures were taken on 28 October 2026 by opening the original saved runs
 from validation history. The run timestamps remain 17 October. Each image identifies
 the selected commit and published architecture version 1. These images replace links
 to private project screens: reviewers do not need project membership or a DCode login.
 
 ### Baseline — passed
 
-![Baseline report: passed with zero violations and 516 dependency edges](paper-materials/screenshots/baseline-report-2026-10-27.jpg)
+![Baseline report: passed with zero violations and 516 dependency edges](paper-materials/screenshots/baseline-report-2026-10-28.jpg)
 
 Commit `30d8786e`: 0 violations, 0 warnings, 100% compliance, 516 dependency edges.
 
 ### Controlled violation — failed
 
-![Controlled violation overview: selected commit, version 1, failed gate and one violation](paper-materials/screenshots/violation-overview-2026-10-27.jpg)
+![Controlled violation overview: selected commit, version 1, failed gate and one violation](paper-materials/screenshots/violation-overview-2026-10-28.jpg)
 
 Commit `b9cf2ac1`: 1 violation, 0 warnings, 517 dependency edges. The report identifies
 `ExpressionUtils → SpelExpressionParser` across the denied Common-to-SpEL boundary.
 The 99.8% aggregate compliance rate does **not** make the architecture gate pass:
 one denied dependency is sufficient for failure.
-[Open the full original violation report](paper-materials/screenshots/violation-report-2026-10-27.jpg)
+[Open the full original violation report](paper-materials/screenshots/violation-report-2026-10-28.jpg)
 for the **Forbidden Dependencies** and **Rule Breakdown** sections near the bottom.
 The clean overview above is a viewport capture; the PDF also includes a labeled lower-report excerpt.
 
 ### Repair — passed
 
-![Repair report: passed with zero violations and 516 dependency edges](paper-materials/screenshots/repair-report-2026-10-27.jpg)
+![Repair report: passed with zero violations and 516 dependency edges](paper-materials/screenshots/repair-report-2026-10-28.jpg)
 
 Commit `3bce90df`: 0 violations, 0 warnings, 100% compliance, 516 dependency edges.
 Removing the controlled mutation restores the original dependency edge set.
