@@ -75,6 +75,14 @@ describes common utilities usable by expression-language providers. The
 [framework overview](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/framework-docs/modules/ROOT/pages/overview.adoc)
 provides the broader module context.
 
+The **Expression API** supplies shared parsing and evaluation contracts, including
+[`ExpressionParser`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/ExpressionParser.java) and
+[`Expression`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/Expression.java). **Common utilities** provides shared conversion
+and template-parsing facilities. **SpEL implementation** contains the concrete
+Spring Expression Language parser and evaluation machinery, represented here by
+[`SpelExpressionParser`](https://github.com/spring-projects/spring-framework/blob/49adc91c7e41eaafb52fc11e1210989894bda1f3/spring-expression/src/main/java/org/springframework/expression/spel/standard/SpelExpressionParser.java)
+and `SpelExpression`.
+
 The same package grouping maps this module's source graph to:
 
 | Component | Package mapping | Type/nested-type graph nodes |
